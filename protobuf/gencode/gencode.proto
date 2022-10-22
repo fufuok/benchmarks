@@ -1,0 +1,7 @@
+struct Message  {
+    Query                string
+    PageNumber           int32
+    ResultPerPage        int32
+    Comment              []byte
+    Corpus               int32
+}

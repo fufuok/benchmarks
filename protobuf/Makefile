@@ -2,9 +2,9 @@ GOBIN=$(shell go env GOPATH)/bin
 
 default: gen bench
 
-gen: gen-gogoprotobuf gen-golangprotobuf gen-golangprotobuf-v2 gen-vtprotobuf gen-csproto gen-fastpb
+gen: gen-gogoprotobuf gen-golangprotobuf gen-golangprotobuf-v2 gen-vtprotobuf gen-csproto gen-fastpb gen-msgp gen-gencode
 
-bench: bench-gogoprotobuf bench-golangprotobuf bench-golangprotobuf-v2 bench-vtprotobuf bench-csproto bench-fastpb
+bench: bench-gogoprotobuf bench-golangprotobuf bench-golangprotobuf-v2 bench-vtprotobuf bench-csproto bench-fastpb bench-msgp bench-gencode
 
 gen-gogoprotobuf:
 	go install github.com/gogo/protobuf/protoc-gen-gofast@latest
@@ -30,6 +30,13 @@ gen-fastpb:
 	go install github.com/cloudwego/fastpb/protoc-gen-fastpb@latest
 	protoc --go_out=fastpb --fastpb_out=fastpb proto/*.proto
 
+gen-msgp:
+	go install github.com/tinylib/msgp@latest
+	@cd msgp && go generate
+
+gen-gencode:
+	@cd gencode && ../bin/gencode go -schema gencode.proto -package gencode
+
 bench-gogoprotobuf:
 	@cd gogoprotobuf && go test -bench . -benchmem
 
@@ -47,6 +54,12 @@ bench-csproto:
 
 bench-fastpb:
 	@cd fastpb && go test -bench . -benchmem
+
+bench-msgp:
+	@cd msgp && go test -bench ^BenchmarkProto3 -benchmem
+
+bench-gencode:
+	@cd gencode && go test -bench . -benchmem
 
 clean: 
 	@rm -rf gogoprotobuf/*.pb.go

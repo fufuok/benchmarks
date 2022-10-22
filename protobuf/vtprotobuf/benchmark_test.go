@@ -2,6 +2,8 @@ package pb
 
 import (
 	"testing"
+
+	"github.com/fufuok/bytespool"
 )
 
 var message = &Message{
@@ -35,6 +37,19 @@ func BenchmarkProto3Unmarshal(b *testing.B) {
 		if err != nil {
 			b.Fatal(err)
 		}
+	}
+}
+
+func BenchmarkProto3Marshal_Pool(b *testing.B) {
+	var err error
+	size := message.SizeVT()
+	for i := 0; i < b.N; i++ {
+		buf := bytespool.Get(size)
+		buf, err = message.Marshal(buf)
+		if err != nil {
+			b.Fatal(err)
+		}
+		bytespool.Put(buf)
 	}
 }
 
